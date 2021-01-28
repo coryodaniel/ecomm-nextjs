@@ -11,10 +11,15 @@ cp .env.local.example .env.local
 vim .env.local
 ```
 
+Start a Redis container:
+
+```bash
+docker run --rm -p 6379:6379 --name k9cloner-redis redis
+```
+
 Run the development server:
 
 ```bash
-
 npm run dev
 # or
 yarn dev

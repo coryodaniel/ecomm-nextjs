@@ -1,29 +1,23 @@
 import Stripe from 'stripe'
 import * as carts from '../../lib/repos/carts'
 import * as pets from '../../lib/repos/pets'
+import baseUrl from '../../lib/utils/baseUrl'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-const url = getUrl()
 
 export default async (req, res) => {
-  const skus = carts.get("fake-user-id")
+  const skus = await carts.get("fake-user-id")
   const lineItems = createLineItemsFromSKUs(skus)
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: lineItems,
     mode: 'payment',
-    success_url: `${url}/success.html`,
-    cancel_url: `${url}/cancel.html`,
+    success_url: `${baseUrl}/api/stripe-checkout-callback?success=true`,
+    cancel_url: `${baseUrl}?canceled=true`,
   })
 
   res.json({ id: session.id })
-}
-
-function getUrl() {
-  const proto = process.env.PROTOCOL || "https"
-  const domain = process.env.VERCEL_URL
-  return `${proto}://${domain}`
 }
 
 function createLineItemsFromSKUs(skus) {
